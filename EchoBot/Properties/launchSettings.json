@@ -1,0 +1,12 @@
+{
+    "profiles": {
+        "EchoBot": {
+            "dotnetRunMessages": true,
+            "commandName": "Project",
+
+            "environmentVariables": {
+                "DOTNET_ECHO_ENVIRONMENT" : "Development"
+            }
+        }
+    }
+}
