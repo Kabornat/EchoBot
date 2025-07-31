@@ -1,6 +1,5 @@
 ﻿using Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
 using Application.Handlers.MessageHandlers.MessageTextHandlers.PrivateChatMessageTextHandlers;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace Application.Handlers.MessageHandlers.MessageTextHandlers;
