@@ -13,6 +13,8 @@ using Persistence.Repositories;
 using Persistence.Services;
 using Application.Commands;
 using Application.Services;
+using EchoBot.Models;
+using Persistence.OtherModels;
 
 // Настройка конфигурации
 var environment = Environment.GetEnvironmentVariable("DOTNET_ECHO_ENVIRONMENT");
@@ -64,7 +66,32 @@ services.AddSingleton<ErrorHandler>();
 
 services.AddSingleton<SendMessageService>();
 services.AddSingleton<BotCommands>();
+
+services.AddSingleton<CommandsList>();
+
 services.AddSingleton<Startup>();
+services.AddSingleton<Stop>();
+
+// BackgroundServices
+services.AddSingleton<DumpConfiguration>(provider =>
+{
+    var dumpConfiguration = configuration.GetRequiredSection("DumpConfiguration").Get<DumpConfiguration>();
+
+    dumpConfiguration.ConnectionString = connectionString;
+
+    return dumpConfiguration;
+});
+
+services.AddSingleton<BotData>(provider =>
+{
+    var botData = configuration.GetRequiredSection("BotData").Get<BotData>();
+
+    botData.UsernameWithDog = '@' + botData.Username;
+
+    return botData;
+});
+
+services.AddSingleton<MainTextService>();
 
 var serviceCollection = services.BuildServiceProvider();
 

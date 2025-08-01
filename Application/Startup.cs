@@ -8,12 +8,14 @@ public class Startup(
     TelegramBotClient botClient,
     CancellationTokenSource cancellationTokenSource,
     UpdateHandler updateHandler,
-    ErrorHandler errorHandler)
+    ErrorHandler errorHandler,
+    CommandsList commandsList)
 {
     private readonly TelegramBotClient _botClient = botClient;
     private readonly CancellationTokenSource _cancellationTokenSource = cancellationTokenSource;
     private readonly UpdateHandler _updateHandler = updateHandler;
     private readonly ErrorHandler _errorHandler = errorHandler;
+    private readonly CommandsList _commandsList = commandsList;
 
     public async Task RunAsync()
     {
@@ -23,6 +25,8 @@ public class Startup(
         {
             DropPendingUpdates = true,
         };
+
+        await _commandsList.OnCommandsAsync();
 
         _botClient.StartReceiving(
             receiverOptions: options,
@@ -36,6 +40,8 @@ public class Startup(
             await Task.Delay(1000);
 
         Console.WriteLine("bot stoping..");
+
+        await _commandsList.OffCommandsAsync();
 
         Console.WriteLine("bot stoped!");
     }
