@@ -39,10 +39,6 @@ public class Startup(
         while (!_cancellationTokenSource.IsCancellationRequested)
             await Task.Delay(1000);
 
-        Console.WriteLine("bot stoping..");
-
-        await _commandsList.OffCommandsAsync();
-
         Console.WriteLine("bot stoped!");
     }
 }

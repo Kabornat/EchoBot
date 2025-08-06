@@ -1,60 +1,26 @@
-﻿using Application.Commands;
+﻿using Application.Handlers.MessageHandlers.MessageTextHandlers.UserMessageTextHandlers;
 using Application.Services;
-using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
 
 public class AdminMessageTextHandler(
-    TelegramBotClient botClient,
-    CancellationTokenSource cancellationTokenSource,
-    BotCommands botCommands,
-    MainTextService mainTextService)
+    UserTextCommandsHandler baseCommandsHandler,
+    AdminTextCommandsHandler adminCommandsHandler,
+    SendMessageService sendMessageService)
 {
-    private readonly TelegramBotClient _botClient = botClient;
-    private readonly CancellationTokenSource _cancellationTokenSource = cancellationTokenSource;
-    private readonly BotCommands _botCommands = botCommands;
-    private readonly MainTextService _mainTextService = mainTextService;
+    private readonly UserTextCommandsHandler _baseCommandsHandler = baseCommandsHandler;
+    private readonly AdminTextCommandsHandler _adminCommandsHandler = adminCommandsHandler;
+    private readonly SendMessageService _sendMessageService = sendMessageService;
 
     public async Task HandleAsync(Message message)
     {
-        var messageText = message.Text;
+        if (await _baseCommandsHandler.HandleAsync(message, Rank.Admin))
+            return;
 
-        if (_botCommands.Start(messageText))
-            await StartHandle(message);
+        if (await _adminCommandsHandler.HandleAsync(message))
+            return;
 
-        if (_botCommands.Stop(messageText))
-            await StopHandle(message);
-
-        else if (_botCommands.Sql(messageText))
-            await SqlHandle(message);
-    }
-
-    private async Task StartHandle(Message message)
-    {
-        var userId = message.From.Id;
-
-        var responce = _mainTextService.GetMainMenuText(Status.Owner);
-
-        await _botClient.SendMessage(userId, responce, ParseMode.Html);
-    }
-
-    private async Task StopHandle(Message message)
-    {
-        var chatId = message.Chat.Id;
-
-        await _botClient.SendMessage(chatId, "бот был остановлен");
-
-        await _cancellationTokenSource.CancelAsync();
-    }
-
-    private async Task SqlHandle(Message message)
-    {
-        var chatId = message.Chat.Id;
-
-        var query = message.Text.Replace(_botCommands.SqlCommand, "");
-
-        await _botClient.SendMessage(chatId, query);
+        await _sendMessageService.SendAsync(message);
     }
 }

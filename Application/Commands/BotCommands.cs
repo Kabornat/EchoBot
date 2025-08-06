@@ -14,6 +14,8 @@ public class BotCommands(BotData botData)
     public readonly string HelpWithUDCommand = "/help" + botData.UsernameWithDog;
 
     public readonly string LeaveCommand = "/leave";
+    public readonly string RulesCommand = "/rules";
+    public readonly string MyidCommand = "/myid";
 
     // Admin commands
     public readonly string MuteCommand = "/mute";
@@ -31,10 +33,11 @@ public class BotCommands(BotData botData)
     public readonly string RankDownCommand = "/rankdown";
     public readonly string AdminsListCommand = "/adminslist";
     public readonly string UserInfoCommand = "/userinfo";
+    public readonly string CoolDownCommand = "/cooldown";
 
     public readonly string StopCommand = "/stopEchoBot";
 
-    public readonly string SqlCommand = "/sqlecho";
+    public readonly string SqlCommand = "/echosql";
 
     public bool Start(string command)
     {
@@ -55,6 +58,16 @@ public class BotCommands(BotData botData)
     public bool Leave(string command)
     {
         return command == LeaveCommand;
+    }
+
+    public bool Rules(string command)
+    {
+        return command == RulesCommand;
+    }
+       
+    public bool Myid(string command)
+    {
+        return command == MyidCommand;
     }
 
 

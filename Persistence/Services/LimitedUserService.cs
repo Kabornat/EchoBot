@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Persistence.Repositories;
 
 namespace Persistence.Services;
 
-public class LimitedUserService
+public class LimitedUserService(IDbContextFactory<AppDbContext> factory) : LimitedUserRepository(factory)
 {
 
 }

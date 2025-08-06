@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories;
 
-public class LimitedUserRepository
+public class LimitedUserRepository(IDbContextFactory<AppDbContext> factory)
 {
+    private readonly IDbContextFactory<AppDbContext> _factory = factory;
 
+    public async Task<DateTime> GetPeriod(long userId)
+    {
+        await using var dbContext = await _factory.CreateDbContextAsync();
+
+        return await dbContext.LimitedUsers
+            .Where(x => x.UserId == userId)
+            .Select(x => x.LimitPeriod)
+            .FirstAsync();
+    }
 }

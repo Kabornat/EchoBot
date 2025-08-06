@@ -1,4 +1,4 @@
-﻿namespace EchoBot.Models;
+﻿namespace Persistence.OtherModels;
 
 public class DumpConfiguration
 {

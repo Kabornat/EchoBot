@@ -24,13 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="echodb.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BackgroundServices\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

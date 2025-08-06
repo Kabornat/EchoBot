@@ -11,8 +11,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250731132205_NewModels")]
-    partial class NewModels
+    [Migration("20250806134038_Clear")]
+    partial class Clear
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,9 @@ namespace Persistence.Migrations
 
                     b.Property<long>("GetterUserId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SendDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<long>("UserId")
                         .HasColumnType("INTEGER");

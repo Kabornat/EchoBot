@@ -5,16 +5,18 @@ using Application.Handlers;
 using Application.Handlers.MessageHandlers;
 using Application.Handlers.MessageHandlers.MessageTextHandlers;
 using Application;
-using Application.Handlers.MessageHandlers.MessageTextHandlers.PrivateChatMessageTextHandlers;
-using Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
 using Persistence;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Repositories;
 using Persistence.Services;
 using Application.Commands;
 using Application.Services;
-using EchoBot.Models;
 using Persistence.OtherModels;
+using Persistence.OtherServices;
+using EchoBot.BackgroundServices;
+using Application.Handlers.MessageHandlers.MessageTextHandlers.OwnerMessageTextHandlers;
+using Application.Handlers.MessageHandlers.MessageTextHandlers.UserMessageTextHandlers;
+using Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
 
 // Настройка конфигурации
 var environment = Environment.GetEnvironmentVariable("DOTNET_ECHO_ENVIRONMENT");
@@ -34,7 +36,8 @@ services.AddDbContextFactory<AppDbContext>(provider =>
 {
     provider.UseSqlite(connectionString);
 
-    provider.LogTo(Console.WriteLine);
+    if (bool.TryParse(configuration["EFLogs"], out bool eFLogs) && eFLogs)
+        provider.LogTo(Console.WriteLine);
 });
 
 services.AddSingleton<ChatMessageRepository>();
@@ -44,6 +47,10 @@ services.AddSingleton<UserRepository>();
 services.AddSingleton<ChatMessageService>();
 services.AddSingleton<LimitedUserService>();
 services.AddSingleton<UserService>();
+
+services.AddSingleton<DumpService>();
+services.AddSingleton<TimerManagerDelayWeek>();
+services.AddSingleton<TimerManagerService>();
 
 // Api
 services.AddSingleton<CancellationTokenSource>();
@@ -55,8 +62,13 @@ services.AddSingleton<TelegramBotClient>(provider =>
 
 services.AddSingleton<CancellationTokenSource>();
 
+services.AddSingleton<OwnerTextCommandsHandler>();
+services.AddSingleton<AdminTextCommandsHandler>();
+services.AddSingleton<UserTextCommandsHandler>();
+
+services.AddSingleton<OwnerMessageTextHandler>();
 services.AddSingleton<AdminMessageTextHandler>();
-services.AddSingleton<PrivateChatMessageTextHandler>();
+services.AddSingleton<UserMessageTextHandler>();
 
 services.AddSingleton<MessageTextHandler>();
 services.AddSingleton<MessageHandler>();
@@ -93,21 +105,22 @@ services.AddSingleton<BotData>(provider =>
 
 services.AddSingleton<MainTextService>();
 
-var serviceCollection = services.BuildServiceProvider();
+var serviceProvider = services.BuildServiceProvider();
 
 // Запуск миграций
 
-//using (var scope = serviceCollection.CreateScope())
-//{
-//    var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+using (var scope = serviceProvider.CreateScope())
+{
+    var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
 
-//    var dbContext = factory.CreateDbContext();
+    var dbContext = factory.CreateDbContext();
 
-//    dbContext.Database.Migrate();
-//}
+    dbContext.Database.Migrate();
+}
 
 // Запуск проекта
+serviceProvider.GetRequiredService<TimerManagerService>();
 
-var startup = serviceCollection.GetRequiredService<Startup>();
+var startup = serviceProvider.GetRequiredService<Startup>();
 
 await startup.RunAsync();
