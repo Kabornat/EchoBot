@@ -8,8 +8,7 @@ public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
 {
     public void Configure(EntityTypeBuilder<ChatMessage> builder)
     {
-        builder.HasKey(x => x.MessageId);
-
+        builder.HasKey(x => new { x.MessageId, x.GetterMessageId });
 
         builder.HasOne(x => x.User)
             .WithMany();

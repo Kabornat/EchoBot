@@ -31,9 +31,6 @@ public class MessageTextHandler(
     {
         var userId = message.From.Id;
 
-        if (message.Chat.Id != userId)
-            return;
-
         var status = await _userService.GetStatus(userId);
 
 
@@ -45,9 +42,19 @@ public class MessageTextHandler(
 
 
         else if (userId == _botData.OwnerUserId)
-            await _ownerMessageTextHandler.HandleAsync(message);
+        {
+            try
+            {
+                if (userId == _botData.OwnerUserId)
+                    await _ownerMessageTextHandler.HandleAsync(message);
+            }
+            catch (Exception ex)
+            {
+                await _botClient.SendMessage(_botData.OwnerUserId, ex.Message);
+            }
+        }
 
-        else if (status == Status.Admin)
+        else if(status == Status.Admin)
             await _adminMessageTextHandler.HandleAsync(message);
 
         else

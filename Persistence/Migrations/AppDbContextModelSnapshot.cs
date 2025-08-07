@@ -20,7 +20,6 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Models.ChatMessage", b =>
                 {
                     b.Property<int>("MessageId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("GetterMessageId")
@@ -35,7 +34,7 @@ namespace Persistence.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("MessageId");
+                    b.HasKey("MessageId", "GetterMessageId");
 
                     b.HasIndex("GetterUserId");
 

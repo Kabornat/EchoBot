@@ -3,7 +3,7 @@ using Persistence.Repositories;
 
 namespace Persistence.Services;
 
-public class ChatMessageService(IDbContextFactory<AppDbContext> factory) : UserRepository(factory)
+public class ChatMessageService(IDbContextFactory<AppDbContext> factory) : ChatMessageRepository(factory)
 {
 
 }

@@ -7,14 +7,25 @@ public class UserRepository(IDbContextFactory<AppDbContext> factory)
 {
     private readonly IDbContextFactory<AppDbContext> _factory = factory;
 
-    public async Task UpdateLastMessageSend(long userId)
+    public async Task<List<long>> GetMessageGettersAsync()
+    {
+        await using var dbContext = await _factory.CreateDbContextAsync();
+
+        return await dbContext.Users
+            .AsNoTracking()
+            .Where(x => x.GetMessages && x.Status != Status.Banned)
+            .Select(x => x.Id)
+            .ToListAsync();
+    }
+    public async Task UpdateLastMessageSendAndGetMessages(long userId)
     {
         await using var dbContext = await _factory.CreateDbContextAsync();
 
         await dbContext.Users
             .Where(x => x.Id == userId)
             .ExecuteUpdateAsync(s => s
-            .SetProperty(p => p.LastMessageSend, DateTime.UtcNow));
+            .SetProperty(p => p.LastMessageSend, DateTime.UtcNow)
+            .SetProperty(p => p.GetMessages, true));
     }
 
     public async Task<bool> LeaveAsync(long userId)
@@ -23,6 +34,16 @@ public class UserRepository(IDbContextFactory<AppDbContext> factory)
 
         return await dbContext.Users
             .Where(x => x.Id == userId && x.GetMessages)
+            .ExecuteUpdateAsync(s => s
+            .SetProperty(p => p.GetMessages, false)) > 0;
+    }
+
+    public async Task<bool> LeaveAsync(List<long> users)
+    {
+        await using var dbContext = await _factory.CreateDbContextAsync();
+
+        return await dbContext.Users
+            .Where(x => users.Contains(x.Id))
             .ExecuteUpdateAsync(s => s
             .SetProperty(p => p.GetMessages, false)) > 0;
     }

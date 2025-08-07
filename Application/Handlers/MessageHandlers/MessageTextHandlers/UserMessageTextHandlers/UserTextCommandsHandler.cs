@@ -103,7 +103,7 @@ $@"
 
         if (!await _userService.LeaveAsync(userId))
         {
-            responce = "Вас нет в чате";
+            responce = "Вас нет в чате, отправьте любое сообщение чтобы войти";
         }
         else
         {

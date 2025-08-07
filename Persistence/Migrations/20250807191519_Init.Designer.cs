@@ -11,8 +11,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250806134038_Clear")]
-    partial class Clear
+    [Migration("20250807191519_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,7 +23,6 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Persistence.Models.ChatMessage", b =>
                 {
                     b.Property<int>("MessageId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("GetterMessageId")
@@ -38,7 +37,7 @@ namespace Persistence.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("MessageId");
+                    b.HasKey("MessageId", "GetterMessageId");
 
                     b.HasIndex("GetterUserId");
 
@@ -65,6 +64,9 @@ namespace Persistence.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("GetMessages")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastMessageSend")
