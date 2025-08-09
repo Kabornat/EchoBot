@@ -16,6 +16,17 @@ public class ChatMessageRepository(IDbContextFactory<AppDbContext> factory)
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task<long> GetUserIdFromReply(int repliedMessageId)
+    {
+        await using var dbContext = await _factory.CreateDbContextAsync();
+
+        return await dbContext.ChatMessages
+            .AsNoTracking()
+            .Where(x => x.GetterMessageId == repliedMessageId)
+            .Select(x => x.UserId)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<int> GetMessageIdForReply(long userId, int repliedMessageId)
     {
         await using var dbContext = await _factory.CreateDbContextAsync();
@@ -25,17 +36,15 @@ public class ChatMessageRepository(IDbContextFactory<AppDbContext> factory)
             .AnyAsync(x => x.GetterMessageId == repliedMessageId))
             return 0;
 
-        var messageId = await dbContext.ChatMessages
-            .AsNoTracking()
-            .Where(x => x.GetterMessageId == repliedMessageId)
-            .Select(x => x.MessageId)
-            .FirstAsync();
-
         return await dbContext.ChatMessages
             .AsNoTracking()
             .Where(
                 x => x.GetterUserId == userId &&
-                x.MessageId == messageId)
+                x.MessageId == dbContext.ChatMessages
+                    .AsNoTracking()
+                    .Where(x => x.GetterMessageId == repliedMessageId)
+                    .Select(x => x.MessageId)
+                    .First())
             .Select(x => x.GetterMessageId)
             .FirstAsync();
     }

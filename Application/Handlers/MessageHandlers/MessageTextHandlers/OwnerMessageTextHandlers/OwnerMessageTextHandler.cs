@@ -1,9 +1,8 @@
-﻿using Application.Commands;
-using Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
+﻿using Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
 using Application.Handlers.MessageHandlers.MessageTextHandlers.UserMessageTextHandlers;
 using Application.Services;
-using Telegram.Bot;
 using Telegram.Bot.Types;
+using User = Persistence.Models.User;
 
 namespace Application.Handlers.MessageHandlers.MessageTextHandlers.OwnerMessageTextHandlers;
 
@@ -11,24 +10,25 @@ public class OwnerMessageTextHandler(
     OwnerTextCommandsHandler ownerTextCommandsHandler,
     AdminTextCommandsHandler adminCommandsHandler,
     UserTextCommandsHandler baseCommandsHandler,
-    SendMessageService sendMessageService)
+    EchoChatService sendMessageService)
 {
     private readonly OwnerTextCommandsHandler _ownerTextCommandsHandler = ownerTextCommandsHandler;
     private readonly AdminTextCommandsHandler _adminCommandsHandler = adminCommandsHandler;
     private readonly UserTextCommandsHandler _baseCommandsHandler = baseCommandsHandler;
-    private readonly SendMessageService _sendMessageService = sendMessageService;
+    private readonly EchoChatService _sendMessageService = sendMessageService;
 
-    public async Task HandleAsync(Message message)
+    public async Task HandleAsync(Message message, User user)
     {
         if (await _baseCommandsHandler.HandleAsync(message, Rank.Owner))
             return;
 
-        if (await _adminCommandsHandler.HandleAsync(message))
+        else if (await _adminCommandsHandler.HandleAsync(message))
             return;
 
-        if (await _ownerTextCommandsHandler.HandleAsync(message))
+        else if(await _ownerTextCommandsHandler.HandleAsync(message))
             return;
 
-        await _sendMessageService.SendAsync(message);
+        else
+            await _sendMessageService.SendMessageAsync(message, user, Rank.Owner);
     }
 }

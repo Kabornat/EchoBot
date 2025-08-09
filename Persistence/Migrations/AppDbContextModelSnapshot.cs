@@ -63,6 +63,9 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Anon")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("GetMessages")
                         .HasColumnType("INTEGER");
 

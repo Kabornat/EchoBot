@@ -10,13 +10,11 @@ namespace Application.Handlers.MessageHandlers.MessageTextHandlers.UserMessageTe
 
 public class UserTextCommandsHandler(
     TelegramBotClient botClient,
-    BotCommands botCommands,
     BotData botData,
     MainTextService mainTextService,
     UserService userService)
 {
     private readonly TelegramBotClient _botClient = botClient;
-    private readonly BotCommands _botCommands = botCommands;
     private readonly BotData _botData = botData;
     private readonly MainTextService _mainTextService = mainTextService;
     private readonly UserService _userService = userService;
@@ -25,22 +23,25 @@ public class UserTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        if (_botCommands.Start(messageText))
+        if (BotCommands.Start(messageText))
             await StartHandle(message, status);
 
-        else if (_botCommands.Anon(messageText))
-            await AnonHandle(message);
-
-        else if (_botCommands.Help(messageText))
+        else if (BotCommands.Help(messageText))
             await HelpHandle(message);
 
-        else if (_botCommands.Leave(messageText))
+        else if (BotCommands.Anon(messageText))
+            await AnonHandle(message);
+
+        else if (BotCommands.Status(messageText))
+            return true;
+
+        else if (BotCommands.Leave(messageText))
             await LeaveHandle(message);
 
-        else if (_botCommands.Rules(messageText))
+        else if (BotCommands.Rules(messageText))
             await RulesHandle(message);
 
-        else if (_botCommands.Myid(messageText))
+        else if (BotCommands.Myid(messageText))
             await MyidHandle(message);
 
         else
@@ -90,7 +91,9 @@ $@"
     {
         var userId = message.From.Id;
 
-        var responce = Random.Shared.Next(2) == 0 ? "🟢 Анонимность была включена" : "🔴 Анонимность была выключена";
+        var anon = await _userService.SetAnonAsync(userId);
+
+        var responce = anon ? "🟢 Анонимность была включена" : "🔴 Анонимность была выключена";
 
         await _botClient.SendMessage(userId, responce, ParseMode.Html);
     }

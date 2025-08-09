@@ -31,6 +31,7 @@ namespace Persistence.Migrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     GetMessages = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Anon = table.Column<bool>(type: "INTEGER", nullable: false),
                     LastMessageSend = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },

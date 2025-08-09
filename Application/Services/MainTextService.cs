@@ -4,11 +4,9 @@ using Persistence.OtherModels;
 namespace Application.Services;
 
 public class MainTextService(
-    BotData botData,
-    BotCommands botCommands)
+    BotData botData)
 {
     private readonly BotData _botData = botData;
-    private readonly BotCommands _botCommands = botCommands;
 
     public string GetMainMenuText(Rank status)
     {
@@ -16,10 +14,10 @@ public class MainTextService(
 $@"
 <b>{_botData.Name} 💭 Главное меню</b>
 
-🚪 {_botCommands.LeaveCommand} - Выйти из чата
-🎭 {_botCommands.AnonCommand} - Включить/выключить анонимность
-❓ {_botCommands.HelpCommand} - Информация о боте
-⚖️ {_botCommands.RulesCommand} - Правила
+🚪 {BotCommands.LeaveCommand} - Выйти из чата
+❓ {BotCommands.HelpCommand} - Информация о боте
+🎭 {BotCommands.AnonCommand} - Включить/выключить анонимность
+⚖️ {BotCommands.RulesCommand} - Правила
 ";
 
         if (status == Rank.Admin || status == Rank.Owner)
@@ -28,10 +26,11 @@ $@"
 $@"
 <b>Команды админов</b>
 
-🤐 {_botCommands.MuteCommand} {{реплай/айди}} {{период в сек}} {{сообщение}} - Выдать мут
-😦 {_botCommands.UnmuteCommand} {{реплай/айди}} - Размутить
-🤜🏼 {_botCommands.BanCommand} {{реплай/айди}} {{сообщение}} - Забанить
-✋🏼 {_botCommands.UnbanCommand} {{реплай/айди}} - Разбанить
+🤐 {BotCommands.MuteCommand} {{реплай/айди}} {{период в секундах}} {{сообщение}} - Выдать мут
+😦 {BotCommands.UnmuteCommand} {{реплай/айди}} - Размутить
+🤜🏼 {BotCommands.BanCommand} {{реплай/айди}} {{сообщение}} - Забанить
+✋🏼 {BotCommands.UnbanCommand} {{реплай/айди}} - Разбанить
+🗑 {BotCommands.DeleteCommand} {{реплай}} - Удалить сообщение
 ";
         }
         if (status == Rank.Owner)
@@ -40,15 +39,15 @@ $@"
 $@"
 <b>Команды создателя</b>
 
-📊 {_botCommands.ChatMembersCountCommand} - Количество участников чата
-⬆️ {_botCommands.RankUpCommand} {{айди}} - Возвести в админы
-⬇️ {_botCommands.RankDownCommand} {{айди}} - Снять админку
-📋 {_botCommands.AdminsListCommand} Список админов
-📋 {_botCommands.MuteListCommand} - Список замученых
-📋 {_botCommands.BanListCommand} - Список забаненых
-ℹ️ {_botCommands.UserInfoCommand} {{реплай/айди}} - Информация о пользователе
-⌛️ {_botCommands.CoolDownCommand} {{период в сек}} - Установить задержку
+📊 {BotCommands.ChatMembersCountCommand} - Количество участников чата
+⬆️ {BotCommands.RankUpCommand} {{айди}} - Возвести в админы
+⬇️ {BotCommands.RankDownCommand} {{айди}} - Снять админку
+📋 {BotCommands.AdminListCommand} Список админов
+📋 {BotCommands.BanListCommand} - Список забаненых
+📋 {BotCommands.MuteListCommand} - Список замученых
+ℹ️ {BotCommands.UserInfoCommand} {{реплай/айди}} - Информация о пользователе
 ";
+//⌛️ {BotCommands.CoolDownCommand} {{период в сек}} - Установить задержку
         }
 
         return text;

@@ -5,19 +5,17 @@ using Telegram.Bot.Types;
 namespace Application;
 
 public class CommandsList(
-    TelegramBotClient botClient,
-    BotCommands botCommands)
+    TelegramBotClient botClient)
 {
     private readonly TelegramBotClient _botClient = botClient;
-    private readonly BotCommands _botCommands = botCommands;
 
     public async Task OnCommandsAsync()
     {
         var commandsList = new BotCommand[] 
         {
-            new(_botCommands.StartCommand, "Главное меню"),
-            new(_botCommands.AnonCommand, "Переключение анонимности"),
-            new(_botCommands.HelpCommand, "FAQ")
+            new(BotCommands.StartCommand, "Главное меню"),
+            new(BotCommands.HelpCommand, "FAQ"),
+            new(BotCommands.AnonCommand, "Переключение анонимности")
         };
 
         await _botClient.SetMyCommands(commandsList, new BotCommandScopeAllPrivateChats());
@@ -27,7 +25,7 @@ public class CommandsList(
     {
         var commandsList = new BotCommand[] 
         {
-            new("/status", "Тех работы"),
+            new(BotCommands.StatusCommand, "Тех работы"),
         };
 
         await _botClient.SetMyCommands(commandsList, new BotCommandScopeAllPrivateChats());

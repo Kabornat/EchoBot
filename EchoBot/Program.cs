@@ -1,22 +1,21 @@
-﻿using Telegram.Bot;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Application;
 using Application.Handlers;
 using Application.Handlers.MessageHandlers;
 using Application.Handlers.MessageHandlers.MessageTextHandlers;
-using Application;
-using Persistence;
-using Microsoft.EntityFrameworkCore;
-using Persistence.Repositories;
-using Persistence.Services;
-using Application.Commands;
-using Application.Services;
-using Persistence.OtherModels;
-using Persistence.OtherServices;
-using EchoBot.BackgroundServices;
+using Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
 using Application.Handlers.MessageHandlers.MessageTextHandlers.OwnerMessageTextHandlers;
 using Application.Handlers.MessageHandlers.MessageTextHandlers.UserMessageTextHandlers;
-using Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
+using Application.Services;
+using EchoBot.BackgroundServices;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Persistence;
+using Persistence.OtherModels;
+using Persistence.OtherServices;
+using Persistence.Repositories;
+using Persistence.Services;
+using Telegram.Bot;
 
 // Настройка конфигурации
 var environment = Environment.GetEnvironmentVariable("DOTNET_ECHO_ENVIRONMENT");
@@ -76,8 +75,7 @@ services.AddSingleton<MessageHandler>();
 services.AddSingleton<UpdateHandler>();
 services.AddSingleton<ErrorHandler>();
 
-services.AddSingleton<SendMessageService>();
-services.AddSingleton<BotCommands>();
+services.AddSingleton<EchoChatService>();
 
 services.AddSingleton<CommandsList>();
 

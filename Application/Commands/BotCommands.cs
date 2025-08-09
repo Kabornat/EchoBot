@@ -1,82 +1,144 @@
-﻿using Persistence.OtherModels;
+﻿namespace Application.Commands;
 
-namespace Application.Commands;
-
-public class BotCommands(BotData botData)
+public static class BotCommands
 {
-    public readonly string StartCommand = "/start";
-    public readonly string StartWithUDCommand = "/start" + botData.UsernameWithDog;
-
-    public readonly string AnonCommand = "/anon";
-    public readonly string AnonWithUDCommand = "/anon" + botData.UsernameWithDog;
-
-    public readonly string HelpCommand = "/help";
-    public readonly string HelpWithUDCommand = "/help" + botData.UsernameWithDog;
-
-    public readonly string LeaveCommand = "/leave";
-    public readonly string RulesCommand = "/rules";
-    public readonly string MyidCommand = "/myid";
+    // User commands
+    public const string StartCommand = "/start";
+    public const string HelpCommand = "/help";
+    public const string AnonCommand = "/anon";
+    public const string StatusCommand = "/status";
+    public const string LeaveCommand = "/leave";
+    public const string RulesCommand = "/rules";
+    public const string MyidCommand = "/myid";
 
     // Admin commands
-    public readonly string MuteCommand = "/mute";
-    public readonly string UnmuteCommand = "/unmute";
-    public readonly string MuteListCommand = "/mutelist";
+    public const string MuteCommand = "/mute";
+    public const string MuteWithSpaceCommand = MuteCommand + " ";
+    public const string UnmuteCommand = "/unmute";
 
-    public readonly string BanCommand = "/ban";
-    public readonly string UnbanCommand = "/unban";
-    public readonly string BanListCommand = "/banlist";
+    public const string BanCommand = "/ban";
+    public const string BanWithSpaceCommand = BanCommand + " ";
+    public const string UnbanCommand = "/unban";
 
     // Owner commands
-    public readonly string ChatMembersCountCommand = "/cmc";
+    public const string ChatMembersCountCommand = "/cmc";
+    public const string RankUpCommand = "/rankup";
+    public const string RankDownCommand = "/rankdown";
+    public const string AdminListCommand = "/adminlist";
+    public const string BanListCommand = "/banlist";
+    public const string MuteListCommand = "/mutelist";
+    public const string UserInfoCommand = "/userinfo";
+    public const string CoolDownCommand = "/cooldown";
+    public const string DeleteCommand = "/delete";
 
-    public readonly string RankUpCommand = "/rankup";
-    public readonly string RankDownCommand = "/rankdown";
-    public readonly string AdminsListCommand = "/adminslist";
-    public readonly string UserInfoCommand = "/userinfo";
-    public readonly string CoolDownCommand = "/cooldown";
+    public const string StopCommand = "/stopEchoBot";
 
-    public readonly string StopCommand = "/stopEchoBot";
+    public const string SqlCommand = "/echosql";
 
-    public readonly string SqlCommand = "/echosql";
-
-    public bool Start(string command)
+    public static bool Start(string command)
     {
-        return command == StartCommand || command == StartWithUDCommand;
+        return command == StartCommand;
     }
 
-    public bool Help(string command)
+    public static bool Help(string command)
     {
-        return command == HelpCommand || command == HelpWithUDCommand;
+        return command == HelpCommand;
     }
 
-    public bool Anon(string command)
+    public static bool Anon(string command)
     {
-        return command == AnonCommand || command == AnonWithUDCommand;
+        return command == AnonCommand;
+    }
+
+    public static bool Status(string command)
+    {
+        return command == StatusCommand;
     }
 
 
-    public bool Leave(string command)
+    public static bool Leave(string command)
     {
         return command == LeaveCommand;
     }
 
-    public bool Rules(string command)
+    public static bool Rules(string command)
     {
         return command == RulesCommand;
     }
        
-    public bool Myid(string command)
+    public static bool Myid(string command)
     {
         return command == MyidCommand;
     }
 
 
-    public bool Stop(string command)
+    public static bool StartsWithMute(string command)
+    {
+        return command.StartsWith(MuteWithSpaceCommand);
+    }
+
+    public static bool StartsWithUnmute(string command)
+    {
+        return command.StartsWith(UnmuteCommand);
+    }
+
+    public static bool StartsWithBan(string command)
+    {
+        return command.StartsWith(BanWithSpaceCommand);
+    }
+
+    public static bool StartsWithUnban(string command)
+    {
+        return command.StartsWith(UnbanCommand);
+    }
+
+    public static bool Delete(string command)
+    {
+        return command == DeleteCommand;
+    }
+
+
+    public static bool ChatMembersCount(string command)
+    {
+        return command == ChatMembersCountCommand;
+    }
+
+    public static bool StartsWithRankUp(string command)
+    {
+        return command.StartsWith(RankUpCommand);
+    }
+
+    public static bool StartsWithRankDown(string command)
+    {
+        return command.StartsWith(RankDownCommand);
+    }
+
+    public static bool Adminlist(string command)
+    {
+        return command == AdminListCommand;
+    }
+
+    public static bool Banlist(string command)
+    {
+        return command == BanListCommand;
+    }
+
+    public static bool Mutelist(string command)
+    {
+        return command == MuteListCommand;
+    }
+
+    public static bool StartsWithUserInfo(string command)
+    {
+        return command.StartsWith(UserInfoCommand);
+    }
+
+    public static bool Stop(string command)
     {
         return command == StopCommand;
     }
 
-    public bool Sql(string command)
+    public static bool Sql(string command)
     {
         return command.StartsWith(SqlCommand);
     }

@@ -11,7 +11,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250807191519_Init")]
+    [Migration("20250809064902_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -64,6 +64,9 @@ namespace Persistence.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Anon")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("GetMessages")
