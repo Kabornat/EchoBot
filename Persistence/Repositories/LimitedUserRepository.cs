@@ -25,10 +25,14 @@ public class LimitedUserRepository(IDbContextFactory<AppDbContext> factory)
 
         try
         {
-            await dbContext.Users
-                .Where(x => x.Id == userId)
+            if (await dbContext.Users
+                .Where(x => x.Id == userId && x.Status != Status.Admin)
                 .ExecuteUpdateAsync(s => s
-                .SetProperty(p => p.Status, Status.Muted));
+                .SetProperty(p => p.Status, Status.Muted)) == 0)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
 
             if (await dbContext.LimitedUsers
                 .AsNoTracking()
@@ -141,7 +145,7 @@ public class LimitedUserRepository(IDbContextFactory<AppDbContext> factory)
         await using var dbContext = await _factory.CreateDbContextAsync();
 
         return await dbContext.Users
-            .Where(x => x.Id == userId)
+            .Where(x => x.Id == userId && x.Status != Status.Admin)
             .ExecuteUpdateAsync(s => s
             .SetProperty(p => p.Status, Status.Banned)) > 0;
     }

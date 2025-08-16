@@ -46,6 +46,7 @@ services.AddSingleton<ChatMessageService>();
 services.AddSingleton<LimitedUserService>();
 services.AddSingleton<UserService>();
 
+// Startup
 services.AddSingleton<TimerManagerDelayWeek>();
 services.AddSingleton<TimerManagerService>();
 
@@ -78,7 +79,7 @@ services.AddSingleton<CommandsList>();
 services.AddSingleton<Startup>();
 services.AddSingleton<Stop>();
 
-// Other
+// Fields
 services.AddSingleton<BotData>(provider =>
 {
     var botData = configuration.GetRequiredSection("BotData").Get<BotData>();
@@ -93,7 +94,6 @@ services.AddSingleton<MainTextService>();
 var serviceProvider = services.BuildServiceProvider();
 
 // Запуск миграций
-
 using (var scope = serviceProvider.CreateScope())
 {
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();

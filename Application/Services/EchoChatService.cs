@@ -33,9 +33,18 @@ public class EchoChatService(
 
         if (!user.Anon)
         {
-            string callbackText = 
-                senderMessage.From.Username is not null ?
-                senderMessage.From.Username : senderMessage.From.FirstName;
+            string callbackText;
+
+            if (user.Status != Status.Admin)
+            {
+                callbackText =
+                    senderMessage.From.Username is not null ?
+                    senderMessage.From.Username : senderMessage.From.FirstName;
+            }
+            else
+            {
+                callbackText = "ADMIN";
+            }
 
             string callbackData = 
                 senderMessage.From.Username is not null ?
