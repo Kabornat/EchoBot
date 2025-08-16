@@ -41,8 +41,8 @@ $@"
 <b>Команды создателя</b>
 
 📊 {BotCommands.ChatMembersCountCommand} - Количество участников чата
-⬆️ {BotCommands.RankUpCommand} {{айди}} - Возвести в админы
-⬇️ {BotCommands.RankDownCommand} {{айди}} - Снять админку
+⬆️ {BotCommands.RankUpCommand} {{реплай/айди}} - Возвести в админы
+⬇️ {BotCommands.RankDownCommand} {{реплай/айди}} - Снять админку
 📋 {BotCommands.AdminListCommand} Список админов
 📋 {BotCommands.BanListCommand} - Список забаненых
 📋 {BotCommands.MuteListCommand} - Список замученых
