@@ -10,12 +10,12 @@ public class OwnerMessageTextHandler(
     OwnerTextCommandsHandler ownerTextCommandsHandler,
     AdminTextCommandsHandler adminCommandsHandler,
     UserTextCommandsHandler baseCommandsHandler,
-    EchoChatService sendMessageService)
+    EchoChatService echoChatServiceService)
 {
     private readonly OwnerTextCommandsHandler _ownerTextCommandsHandler = ownerTextCommandsHandler;
     private readonly AdminTextCommandsHandler _adminCommandsHandler = adminCommandsHandler;
     private readonly UserTextCommandsHandler _baseCommandsHandler = baseCommandsHandler;
-    private readonly EchoChatService _sendMessageService = sendMessageService;
+    private readonly EchoChatService _echoChatServiceService = echoChatServiceService;
 
     public async Task HandleAsync(Message message, User user)
     {
@@ -29,6 +29,6 @@ public class OwnerMessageTextHandler(
             return;
 
         else
-            await _sendMessageService.SendMessageAsync(message, user, Rank.Owner);
+            await _echoChatServiceService.SendMessageAsync(message, user);
     }
 }

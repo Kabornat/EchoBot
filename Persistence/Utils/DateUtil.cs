@@ -2,11 +2,11 @@
 
 public static class DateUtil
 {
-    public static TimeSpan GetUntilNextDay()
+    public static TimeSpan GetUntilNext(int days)
     {
         var utcNow = DateTime.UtcNow;
 
-        var nextMidnight = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day).AddDays(1);
+        var nextMidnight = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day).AddDays(days);
 
         return nextMidnight - utcNow;
     }

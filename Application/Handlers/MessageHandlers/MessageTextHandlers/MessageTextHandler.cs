@@ -46,7 +46,7 @@ public class MessageTextHandler(
             }
         }
 
-        else if(status == Status.Admin)
+        else if(status is Status.Admin)
             await _adminMessageTextHandler.HandleAsync(message, user);
 
         else

@@ -6,22 +6,22 @@ using User = Persistence.Models.User;
 namespace Application.Handlers.MessageHandlers.MessageTextHandlers.AdminMessageTextHandlers;
 
 public class AdminMessageTextHandler(
-    UserTextCommandsHandler baseCommandsHandler,
+    UserTextCommandsHandler userCommandsHandler,
     AdminTextCommandsHandler adminCommandsHandler,
-    EchoChatService sendMessageService)
+    EchoChatService echoChatServiceService)
 {
-    private readonly UserTextCommandsHandler _baseCommandsHandler = baseCommandsHandler;
+    private readonly UserTextCommandsHandler _userCommandsHandler = userCommandsHandler;
     private readonly AdminTextCommandsHandler _adminCommandsHandler = adminCommandsHandler;
-    private readonly EchoChatService _sendMessageService = sendMessageService;
+    private readonly EchoChatService _echoChatServiceService = echoChatServiceService;
 
     public async Task HandleAsync(Message message, User user)
     {
-        if (await _baseCommandsHandler.HandleAsync(message, Rank.Admin))
+        if (await _userCommandsHandler.HandleAsync(message, Rank.Admin))
             return;
 
         if (await _adminCommandsHandler.HandleAsync(message))
             return;
 
-        await _sendMessageService.SendMessageAsync(message, user, Rank.Admin);
+        await _echoChatServiceService.SendMessageAsync(message, user);
     }
 }

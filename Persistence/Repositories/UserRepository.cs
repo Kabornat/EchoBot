@@ -16,6 +16,7 @@ public class UserRepository(IDbContextFactory<AppDbContext> factory)
             .Select(x => x.Id)
             .ToListAsync();
     }
+
     public async Task<List<long>> GetListAsync(Status status)
     {
         await using var dbContext = await _factory.CreateDbContextAsync();
@@ -24,6 +25,15 @@ public class UserRepository(IDbContextFactory<AppDbContext> factory)
             .AsNoTracking()
             .Where(x => x.Status == status)
             .Select(x => x.Id)
+            .ToListAsync();
+    }
+
+    public async Task<List<LimitedUser>> GetMutelistAsync()
+    {
+        await using var dbContext = await _factory.CreateDbContextAsync();
+
+        return await dbContext.LimitedUsers
+            .AsNoTracking()
             .ToListAsync();
     }
 

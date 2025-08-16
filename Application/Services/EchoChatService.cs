@@ -17,7 +17,7 @@ public class EchoChatService(
     private readonly UserService _userService = userService;
     private readonly ChatMessageService _chatMessageService = chatMessageService;
 
-    public async Task SendMessageAsync(Message senderMessage, User user, Rank rank = Rank.User)
+    public async Task SendMessageAsync(Message senderMessage, User user)
     {
         var senderUserId = senderMessage.From.Id;
 
@@ -56,7 +56,7 @@ public class EchoChatService(
                 Message getterMessage;
 
                 var replyMessageId = senderMessage.ReplyToMessage is not null
-                    ? await _chatMessageService.GetMessageIdForReply(getterUserId, senderMessage.ReplyToMessage.MessageId)
+                    ? await _chatMessageService.GetMessageIdForGetter(getterUserId, senderMessage.ReplyToMessage.MessageId)
                     : 0;
 
                 switch (senderMessage.Type)
@@ -138,17 +138,6 @@ public class EchoChatService(
                             replyMarkup: inlineKeyboard);
                         break;
 
-                    case MessageType.PinnedMessage:
-                        if (rank is not Rank.Owner && rank is not Rank.Admin)
-                            return;
-
-                        if (replyMessageId == 0)
-                            continue;
-
-                        await botClient.PinChatMessage(getterUserId,
-                           replyMessageId);
-                        continue;
-
                     case MessageType.Poll:
                         getterMessage = await botClient.ForwardMessage(getterUserId,
                             senderMessage.From.Id,
@@ -219,6 +208,7 @@ public class EchoChatService(
         await _chatMessageService.AddAsync(chatMessages);
         await _userService.LeaveAsync(usersToLeave);
     }
+
     public async Task DeleteMessageAsync(Message senderMessage)
     {
         if (senderMessage.ReplyToMessage is null)
@@ -233,7 +223,7 @@ public class EchoChatService(
             try
             {
                 var replyMessageId = senderMessage.ReplyToMessage is not null
-                    ? await _chatMessageService.GetMessageIdForReply(getterUserId, senderMessage.ReplyToMessage.MessageId)
+                    ? await _chatMessageService.GetMessageIdForGetter(getterUserId, senderMessage.ReplyToMessage.MessageId)
                     : 0;
 
                 if (replyMessageId == 0)
@@ -253,5 +243,36 @@ public class EchoChatService(
         await _userService.LeaveAsync(usersToLeave);
 
         await _botClient.SendMessage(senderMessage.From.Id, "<b>Сообщение было удалено</b>", ParseMode.Html);
+    }
+
+    public async Task PinMessageAsync(Message senderMessage)
+    {
+        var getterUsers = await _userService.GetMessageGettersAsync();
+
+        var usersToLeave = new List<long>();
+
+        foreach (var getterUserId in getterUsers)
+        {
+            try
+            {
+                var replyMessageId = senderMessage.ReplyToMessage is not null
+                    ? await _chatMessageService.GetMessageIdForGetter(getterUserId, senderMessage.ReplyToMessage.MessageId)
+                    : 0;
+
+                if (replyMessageId == 0)
+                    continue;
+
+                await botClient.PinChatMessage(getterUserId,
+                   replyMessageId);
+            }
+            catch (Exception ex)
+            {
+                usersToLeave.Add(getterUserId);
+                Console.WriteLine(ex);
+                continue;
+            }
+        }
+
+        await _userService.LeaveAsync(usersToLeave);
     }
 }

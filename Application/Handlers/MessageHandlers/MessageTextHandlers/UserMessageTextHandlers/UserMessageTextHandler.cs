@@ -1,6 +1,7 @@
 ﻿using Application.Services;
 using Persistence.Models;
 using Persistence.Services;
+using Persistence.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -9,12 +10,12 @@ using User = Persistence.Models.User;
 namespace Application.Handlers.MessageHandlers.MessageTextHandlers.UserMessageTextHandlers;
 
 public class UserMessageTextHandler(
-    EchoChatService sendMessageService,
+    EchoChatService echoChatServiceService,
     UserTextCommandsHandler baseCommandsHandler,
     LimitedUserService limitedUserService,
     TelegramBotClient botClient)
 {
-    private readonly EchoChatService _sendMessageService = sendMessageService;
+    private readonly EchoChatService _echoChatServiceService = echoChatServiceService;
     private readonly UserTextCommandsHandler _baseCommandsHandler = baseCommandsHandler;
     private readonly LimitedUserService _limitedUserService = limitedUserService;
     private readonly TelegramBotClient _botClient = botClient;
@@ -31,19 +32,19 @@ public class UserMessageTextHandler(
             return;
 
         else
-            await _sendMessageService.SendMessageAsync(message, user);
+            await _echoChatServiceService.SendMessageAsync(message, user);
     }
 
     public async Task MutedHandle(Message message)
     {
         var userId = message.From.Id;
 
-        var period = await _limitedUserService.GetPeriod(userId);
+        var period = await _limitedUserService.GetPeriodAsync(userId);
 
         string responce =
             "🤐 <b>Вам был выдан мут</b>\n\n" +
 
-            $"Вы снова сможете писать в: {period:dd.MM.yyyy HH:mm:ss} (UTC)";
+            $"Вы снова сможете писать в: {TextFormatter.GetDateFormated(period)} (UTC)";
 
         if (await _limitedUserService.UnmuteAsync(userId, period))
         {

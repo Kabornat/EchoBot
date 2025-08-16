@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Persistence.Models;
 using Persistence.Repositories;
+using Persistence.Utils;
 
 namespace Persistence.Services;
 
@@ -53,12 +54,12 @@ public class UserService(IDbContextFactory<AppDbContext> factory) : UserReposito
 
     public async Task<string> GetMutelistResponceAsync()
     {
-        var userIds = await GetListAsync(Status.Muted);
+        var users = await GetMutelistAsync();
 
         var sb = new StringBuilder(MAX_USERS)
             .AppendLine("<b>Список замученых</b>\n");
 
-        for (int i = 0; i < userIds.Count; i++)
+        for (int i = 0; i < users.Count; i++)
         {
             if (i == MAX_USERS)
             {
@@ -66,7 +67,9 @@ public class UserService(IDbContextFactory<AppDbContext> factory) : UserReposito
                 break;
             }
 
-            sb.AppendLine($"<code>{userIds[i]}</code>");
+            var user = users[i];
+
+            sb.AppendLine($"<code>{user.UserId}</code> до {TextFormatter.GetDateFormated(user.LimitPeriod)}");
         }
 
         return sb.ToString();

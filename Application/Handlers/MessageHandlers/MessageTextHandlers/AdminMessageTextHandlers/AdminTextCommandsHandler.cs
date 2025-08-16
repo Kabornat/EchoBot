@@ -1,6 +1,7 @@
 ﻿using Application.Commands;
 using Application.Services;
 using Persistence.Services;
+using Persistence.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -37,6 +38,9 @@ public class AdminTextCommandsHandler(
         else if (BotCommands.Delete(messageText))
             await DeleteHandle(message);
 
+        else if (BotCommands.Pin(messageText))
+            await PinHandle(message);
+
         else
             return false;
 
@@ -47,7 +51,7 @@ public class AdminTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        var arg = messageText.Replace(BotCommands.MuteCommand + " ", string.Empty);
+        var arg = TextFormatter.GetArgument(messageText, BotCommands.MuteWithSpaceCommand);
 
         var messageReplyToMessage = message.ReplyToMessage;
 
@@ -69,62 +73,51 @@ public class AdminTextCommandsHandler(
         var args = arg.Split();
 
         if (messageReplyToMessage is not null &&
-            args.Length > 0)
+            args.Length > 0 &&
+            arg.Replace(args[0], string.Empty) is var repliedMessageForLimitUser &&
+            int.TryParse(args[0], out var repliedPeriodInSeconds) &&
+            DateTime.UtcNow.AddSeconds(repliedPeriodInSeconds) is var repliedMutePeriod &&
+            !string.IsNullOrEmpty(repliedMessageForLimitUser) &&
+            await _chatMessageService.GetUserIdFromReply(messageReplyToMessage.MessageId) is var repliedMessageUserId &&
+            repliedMessageUserId != 0 &&
+            await _limitedUserService.MuteAsync(repliedMessageUserId, repliedMutePeriod))
         {
-            var messageForLimitUser = arg.Replace(args[0], string.Empty);
-
-            if (int.TryParse(args[0], out int repliedPeriodInSeconds) &&
-                !string.IsNullOrEmpty(messageForLimitUser) &&
-                await _chatMessageService.GetUserIdFromReply(messageReplyToMessage.MessageId) is long repliedMessageUserId &&
-                repliedMessageUserId != 0 &&
-                await _limitedUserService.MuteAsync(repliedMessageUserId, DateTime.UtcNow.AddSeconds(repliedPeriodInSeconds)))
-            {
-                await SendMessageForLimitedUser(
+            await SendMessageForLimitedUser(
                 repliedMessageUserId,
                 string.Format(
                     messageForLimitedUser,
                     repliedPeriodInSeconds,
-                    DateTime.UtcNow.AddSeconds(repliedPeriodInSeconds),
+                    TextFormatter.GetDateFormated(repliedMutePeriod),
+                    repliedMessageForLimitUser));
+
+            responce = string.Format(
+                 succesful,
+                 repliedPeriodInSeconds,
+                 TextFormatter.GetDateFormated(repliedMutePeriod),
+                 repliedMessageForLimitUser);
+        }
+        else if(
+            args.Length > 2 &&
+            arg.Replace(args[0] + ' ' + args[1], string.Empty) is var messageForLimitUser &&
+            long.TryParse(args[0], out var argMessageUserId) && argMessageUserId != 0 &&
+            int.TryParse(args[1], out var periodInSeconds) &&
+            DateTime.UtcNow.AddSeconds(periodInSeconds) is var mutePeriod &&
+            !string.IsNullOrEmpty(messageForLimitUser) &&
+            await _limitedUserService.MuteAsync(argMessageUserId, mutePeriod))
+        {
+            await SendMessageForLimitedUser(
+                argMessageUserId,
+                string.Format(
+                    messageForLimitedUser,
+                    periodInSeconds,
+                    TextFormatter.GetDateFormated(mutePeriod),
                     messageForLimitUser));
 
-                responce = string.Format(
-                        succesful,
-                        repliedPeriodInSeconds,
-                        DateTime.UtcNow.AddSeconds(repliedPeriodInSeconds),
-                        messageForLimitUser);
-            }
-            else
-            {
-                responce = unsucceful;
-            }
-        }
-        else if(args.Length > 2)
-        {
-            var messageForLimitUser = arg.Replace(args[0] + ' ' + args[1], string.Empty);
-
-            if (long.TryParse(args[0], out long argMessageUserId) && argMessageUserId != 0 &&
-                int.TryParse(args[1], out int periodInSeconds) &&
-                !string.IsNullOrEmpty(messageForLimitUser) &&
-                await _limitedUserService.MuteAsync(argMessageUserId, DateTime.UtcNow.AddSeconds(periodInSeconds)))
-            {
-                await SendMessageForLimitedUser(
-                    argMessageUserId,
-                    string.Format(
-                        messageForLimitedUser,
-                        periodInSeconds,
-                        DateTime.UtcNow.AddSeconds(periodInSeconds),
-                        messageForLimitUser));
-
-                responce = string.Format(
-                        succesful,
-                        periodInSeconds,
-                        DateTime.UtcNow.AddSeconds(periodInSeconds),
-                        messageForLimitUser);
-            }
-            else
-            {
-                responce = unsucceful;
-            }
+            responce = string.Format(
+                succesful,
+                periodInSeconds,
+                TextFormatter.GetDateFormated(mutePeriod),
+                messageForLimitUser);
         }
         else
         {
@@ -138,7 +131,7 @@ public class AdminTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        var arg = messageText.Replace(BotCommands.UnmuteCommand + " ", string.Empty);
+        var arg = TextFormatter.GetArgument(messageText, BotCommands.UnmuteWithSpaceCommand);
 
         var messageReplyToMessage = message.ReplyToMessage;
 
@@ -185,7 +178,7 @@ public class AdminTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        var arg = messageText.Replace(BotCommands.MuteCommand + " ", string.Empty);
+        var arg = TextFormatter.GetArgument(messageText, BotCommands.BanWithSpaceCommand);
 
         var messageReplyToMessage = message.ReplyToMessage;
 
@@ -205,44 +198,31 @@ public class AdminTextCommandsHandler(
         var args = arg.Split();
 
         if (messageReplyToMessage is not null &&
-            args.Length > 0)
+            args.Length > 0 &&
+            arg.Replace(args[0], string.Empty) is var repliedMessageForLimitUser &&
+            !string.IsNullOrEmpty(repliedMessageForLimitUser) &&
+            await _chatMessageService.GetUserIdFromReply(messageReplyToMessage.MessageId) is long repliedMessageUserId &&
+            repliedMessageUserId != 0 &&
+            await _limitedUserService.BanAsync(repliedMessageUserId))
         {
-            var messageForLimitUser = arg.Replace(args[0], string.Empty);
-
-            if (!string.IsNullOrEmpty(messageForLimitUser) &&
-                await _chatMessageService.GetUserIdFromReply(messageReplyToMessage.MessageId) is long repliedMessageUserId &&
-                repliedMessageUserId != 0 &&
-                await _limitedUserService.BanAsync(repliedMessageUserId))
-            {
-                await SendMessageForLimitedUser(
+            await SendMessageForLimitedUser(
                     repliedMessageUserId,
-                    string.Format(messageForLimitedUser, messageForLimitUser), true);
+                    string.Format(messageForLimitedUser, repliedMessageForLimitUser), true);
 
-                responce = string.Format(succesful, messageForLimitUser);
-            }
-            else
-            {
-                responce = unsucceful;
-            }
+            responce = string.Format(succesful, repliedMessageForLimitUser);
         }
-        else if (args.Length > 2)
+        else if (
+            args.Length > 2 &&
+            arg.Replace(args[0] + ' ' + args[1], string.Empty) is var messageForLimitUser &&
+            long.TryParse(args[0], out long argMessageUserId) && argMessageUserId != 0 &&
+            !string.IsNullOrEmpty(messageForLimitUser) &&
+            await _limitedUserService.BanAsync(argMessageUserId))
         {
-            var messageForLimitUser = arg.Replace(args[0] + ' ' + args[1], string.Empty);
+            await SendMessageForLimitedUser(
+                argMessageUserId,
+                string.Format(messageForLimitedUser, messageForLimitUser), true);
 
-            if (long.TryParse(args[0], out long argMessageUserId) && argMessageUserId != 0 &&
-                !string.IsNullOrEmpty(messageForLimitUser) &&
-                await _limitedUserService.BanAsync(argMessageUserId))
-            {
-                await SendMessageForLimitedUser(
-                    argMessageUserId,
-                    string.Format(messageForLimitedUser, messageForLimitUser), true);
-
-                responce = string.Format(succesful, messageForLimitUser);
-            }
-            else
-            {
-                responce = unsucceful;
-            }
+            responce = string.Format(succesful, messageForLimitUser);
         }
         else
         {
@@ -256,7 +236,7 @@ public class AdminTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        var arg = messageText.Replace(BotCommands.UnbanCommand + " ", string.Empty);
+        var arg = TextFormatter.GetArgument(messageText, BotCommands.UnbanWithSpaceCommand);
 
         var messageReplyToMessage = message.ReplyToMessage;
 
@@ -301,6 +281,12 @@ public class AdminTextCommandsHandler(
     {
         await _sendMessageService.DeleteMessageAsync(message);
     }
+
+    private async Task PinHandle(Message message)
+    {
+        await _sendMessageService.PinMessageAsync(message);
+    }
+
 
     public async Task SendMessageForLimitedUser(long userId, string messageText, bool pinMessage = false)
     {

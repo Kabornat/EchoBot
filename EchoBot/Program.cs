@@ -12,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence;
 using Persistence.OtherModels;
-using Persistence.OtherServices;
 using Persistence.Repositories;
 using Persistence.Services;
 using Telegram.Bot;
@@ -47,7 +46,6 @@ services.AddSingleton<ChatMessageService>();
 services.AddSingleton<LimitedUserService>();
 services.AddSingleton<UserService>();
 
-services.AddSingleton<DumpService>();
 services.AddSingleton<TimerManagerDelayWeek>();
 services.AddSingleton<TimerManagerService>();
 
@@ -58,8 +56,6 @@ services.AddSingleton<TelegramBotClient>(provider =>
 {
     return new TelegramBotClient(configuration["BotToken"]);
 });
-
-services.AddSingleton<CancellationTokenSource>();
 
 services.AddSingleton<OwnerTextCommandsHandler>();
 services.AddSingleton<AdminTextCommandsHandler>();
@@ -82,16 +78,7 @@ services.AddSingleton<CommandsList>();
 services.AddSingleton<Startup>();
 services.AddSingleton<Stop>();
 
-// BackgroundServices
-services.AddSingleton<DumpConfiguration>(provider =>
-{
-    var dumpConfiguration = configuration.GetRequiredSection("DumpConfiguration").Get<DumpConfiguration>();
-
-    dumpConfiguration.ConnectionString = connectionString;
-
-    return dumpConfiguration;
-});
-
+// Other
 services.AddSingleton<BotData>(provider =>
 {
     var botData = configuration.GetRequiredSection("BotData").Get<BotData>();

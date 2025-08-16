@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using Application.Commands;
-using Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Models;
 using Persistence.Services;
+using Persistence.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -16,12 +16,14 @@ public class OwnerTextCommandsHandler(
     Stop stop,
     UserService userService,
     ChatMessageService chatMessageService,
+    LimitedUserService limitedUserService,
     IDbContextFactory<AppDbContext> factory)
 {
     private readonly TelegramBotClient _botClient = botClient;
     private readonly Stop _stop = stop;
     private readonly UserService _userService = userService;
     private readonly ChatMessageService _chatMessageService = chatMessageService;
+    private readonly LimitedUserService _limitedUserService = limitedUserService;
     private readonly IDbContextFactory<AppDbContext> _factory = factory;
 
     public async Task<bool> HandleAsync(Message message)
@@ -74,7 +76,7 @@ public class OwnerTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        var arg = messageText.Replace(BotCommands.RankUpCommand, string.Empty);
+        var arg = TextFormatter.GetArgument(messageText, BotCommands.RankUpCommand);
 
         var messageReplyToMessage = message.ReplyToMessage;
 
@@ -108,7 +110,7 @@ public class OwnerTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        var arg = messageText.Replace(BotCommands.RankDownCommand, string.Empty);
+        var arg = TextFormatter.GetArgument(messageText, BotCommands.RankDownCommand);
 
         var messageReplyToMessage = message.ReplyToMessage;
 
@@ -163,7 +165,7 @@ public class OwnerTextCommandsHandler(
     {
         var messageText = message.Text;
 
-        var arg = messageText.Replace(BotCommands.UserInfoCommand, string.Empty);
+        var arg = TextFormatter.GetArgument(messageText, BotCommands.UserInfoCommand);
 
         var messageReplyToMessage = message.ReplyToMessage;
 
@@ -181,6 +183,13 @@ public class OwnerTextCommandsHandler(
             var status = await _userService.GetStatusAsync(repliedMessageUserId);
 
             responce = string.Format(succesful, repliedMessageUserId, status);
+
+            if (status is Status.Muted)
+            {
+                var period = await _limitedUserService.GetPeriodAsync(repliedMessageUserId);
+
+                responce += $"\nДо {TextFormatter.GetDateFormated(period)}";
+            }
         }
         else if (long.TryParse(arg, out long argMessageUserId) &&
             argMessageUserId != 0)
@@ -188,6 +197,13 @@ public class OwnerTextCommandsHandler(
             var status = await _userService.GetStatusAsync(argMessageUserId);
 
             responce = string.Format(succesful, argMessageUserId, status);
+
+            if (status is Status.Muted)
+            {
+                var period = await _limitedUserService.GetPeriodAsync(argMessageUserId);
+
+                responce += $"\nДо {TextFormatter.GetDateFormated(period)}";
+            }
         }
         else
         {

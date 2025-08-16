@@ -15,10 +15,12 @@ public static class BotCommands
     public const string MuteCommand = "/mute";
     public const string MuteWithSpaceCommand = MuteCommand + " ";
     public const string UnmuteCommand = "/unmute";
+    public const string UnmuteWithSpaceCommand = UnmuteCommand + " ";
 
     public const string BanCommand = "/ban";
     public const string BanWithSpaceCommand = BanCommand + " ";
     public const string UnbanCommand = "/unban";
+    public const string UnbanWithSpaceCommand = UnbanCommand + " ";
 
     // Owner commands
     public const string ChatMembersCountCommand = "/cmc";
@@ -30,6 +32,7 @@ public static class BotCommands
     public const string UserInfoCommand = "/userinfo";
     public const string CoolDownCommand = "/cooldown";
     public const string DeleteCommand = "/delete";
+    public const string PinCommand = "/pin";
 
     public const string StopCommand = "/stopEchoBot";
 
@@ -95,6 +98,11 @@ public static class BotCommands
     public static bool Delete(string command)
     {
         return command == DeleteCommand;
+    }
+    
+    public static bool Pin(string command)
+    {
+        return command == PinCommand;
     }
 
 

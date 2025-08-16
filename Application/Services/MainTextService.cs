@@ -12,7 +12,7 @@ public class MainTextService(
     {
         string text =
 $@"
-<b>{_botData.Name} 💭 Главное меню</b>
+<b>{_botData.Name} Главное меню</b>
 
 🚪 {BotCommands.LeaveCommand} - Выйти из чата
 ❓ {BotCommands.HelpCommand} - Информация о боте
@@ -20,7 +20,7 @@ $@"
 ⚖️ {BotCommands.RulesCommand} - Правила
 ";
 
-        if (status == Rank.Admin || status == Rank.Owner)
+        if (status is Rank.Admin || status is Rank.Owner)
         {
             text +=
 $@"
@@ -31,9 +31,10 @@ $@"
 🤜🏼 {BotCommands.BanCommand} {{реплай/айди}} {{сообщение}} - Забанить
 ✋🏼 {BotCommands.UnbanCommand} {{реплай/айди}} - Разбанить
 🗑 {BotCommands.DeleteCommand} {{реплай}} - Удалить сообщение
+📌 {BotCommands.PinCommand} {{реплай}} - Закрепить сообщение
 ";
         }
-        if (status == Rank.Owner)
+        if (status is Rank.Owner)
         {
             text +=
 $@"

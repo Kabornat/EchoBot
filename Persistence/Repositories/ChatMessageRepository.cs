@@ -27,7 +27,7 @@ public class ChatMessageRepository(IDbContextFactory<AppDbContext> factory)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<int> GetMessageIdForReply(long userId, int repliedMessageId)
+    public async Task<int> GetMessageIdForGetter(long userId, int repliedMessageId)
     {
         await using var dbContext = await _factory.CreateDbContextAsync();
 

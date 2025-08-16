@@ -25,7 +25,7 @@ public class CommandsList(
     {
         var commandsList = new BotCommand[] 
         {
-            new(BotCommands.StatusCommand, "Тех работы"),
+            new(BotCommands.StatusCommand, "Тех работы, ожидайте"),
         };
 
         await _botClient.SetMyCommands(commandsList, new BotCommandScopeAllPrivateChats());
