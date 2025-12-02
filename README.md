@@ -1,3 +1,5 @@
+**Телеграм бот эхо чат на C#**
+
 **Запуск бота**
 
 В appsettings.json.example (EchoBot/Properties) необходимо указать все данные, 
